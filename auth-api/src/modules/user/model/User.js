@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
 import sequelize from '../../../config/db/dbConfig.js';
+import bcrypt from 'bcrypt';
 
 const User = sequelize.define(
   'user',
@@ -23,12 +24,19 @@ const User = sequelize.define(
         },
       },
     },
-    password: {
+    password_hash: {
       type: Sequelize.STRING,
-      allowNull: false,
     },
+    password: {
+      type: Sequelize.VIRTUAL,
+      allowNull: false,
+    }
   },
   {},
 );
+
+User.addHook('beforeSave', async (user) => {
+  user.password_hash = await bcrypt.hash(user.password, 10);
+});
 
 export default User;

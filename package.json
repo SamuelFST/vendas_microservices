@@ -1,0 +1,29 @@
+{
+  "name": "vendas_microservices",
+  "version": "1.0.0",
+  "description": "Microsserviços que compõem um sistema de vendas de produtos. Projeto construído para mostrar a comunicação entre microsserviços utilizando o RabbitMQ.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamuelFST/vendas_microservices.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamuelFST/vendas_microservices/issues"
+  },
+  "homepage": "https://github.com/SamuelFST/vendas_microservices#readme",
+  "devDependencies": {
+    "commitizen": "^4.2.6",
+    "cz-conventional-changelog": "^3.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

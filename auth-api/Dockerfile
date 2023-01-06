@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN yarn
 COPY . .
 EXPOSE 8080
-CMD ["node", "server.js"]
+CMD ["node", "-r sucrase/register server.js"]

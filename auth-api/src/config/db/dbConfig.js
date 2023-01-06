@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-const env = process.env;
+const { env } = process;
 
 const sequelize = new Sequelize(
   env.DATABASE_NAME || 'auth_db',
@@ -24,7 +24,7 @@ const sequelize = new Sequelize(
 sequelize
   .authenticate()
   .then(() => {
-    console.log('Connected to postgres')
+    console.log('Connected to postgres');
   })
   .catch((err) => {
     console.error('Unable to connect to postgres database');

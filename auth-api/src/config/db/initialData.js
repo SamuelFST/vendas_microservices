@@ -1,7 +1,6 @@
-import bcrypt from 'bcrypt';
-import User from '../../modules/user/model/User.js';
+import User from '../../modules/user/model/User';
 
-export async function initialData() {
+export default async function initialData() {
   try {
     await User.sync({ force: true });
 

@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
-import sequelize from '../../../config/db/dbConfig.js';
 import bcrypt from 'bcrypt';
+import sequelize from '../../../config/db/dbConfig';
 
 const User = sequelize.define(
   'user',
@@ -30,7 +30,7 @@ const User = sequelize.define(
     password: {
       type: Sequelize.VIRTUAL,
       allowNull: false,
-    }
+    },
   },
   {},
 );

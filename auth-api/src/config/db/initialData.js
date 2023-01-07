@@ -9,6 +9,12 @@ export default async function initialData() {
       email: 'user@mail.com',
       password: '123456',
     });
+
+    await User.create({
+      name: 'User2',
+      email: 'user2@mail.com',
+      password: '123456',
+    });
   } catch (err) {
     console.error(err);
   }

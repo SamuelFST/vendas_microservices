@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 import httpStatus from '../../../config/constants/httpStatus';
 import secrets from '../../../config/constants/secrets';
 import UserRepository from '../../user/repository/UserRepository';
-import UserService from '../../user/service/UserService';
 import AuthException from '../exception/AuthException';
+import UserService from '../../user/service/UserService';
 
 class AuthService {
   async authenticate(req) {

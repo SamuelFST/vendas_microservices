@@ -1,15 +1,20 @@
 import UserRepository from '../repository/UserRepository';
 import httpStatus from '../../../config/constants/httpStatus';
 import UserException from '../exception/UserException';
+import AuthException from '../../auth/exception/AuthException';
 
 class UserService {
   async findByEmail(req) {
     try {
       const { email } = req.params;
+      const { userId } = req;
+
       this.validateRequestData(email);
 
       const user = await UserRepository.findByEmail(email);
+
       this.validateUserNotFound(user);
+      this.validateAuthenticatedUser(user.id, userId);
 
       return {
         status: httpStatus.SUCCESS,
@@ -41,6 +46,15 @@ class UserService {
       throw new UserException(
         httpStatus.NOT_FOUND,
         'User was not found',
+      );
+    }
+  }
+
+  validateAuthenticatedUser(userId, authUserId) {
+    if (!authUserId || (userId !== authUserId)) {
+      throw new AuthException(
+        httpStatus.FORBIDDEN,
+        'You cannot see this user data',
       );
     }
   }

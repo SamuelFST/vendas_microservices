@@ -9,13 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "products")
 public class Product {
@@ -36,4 +29,55 @@ public class Product {
 	@ManyToOne
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
+
+	public Product() {
+	}
+
+	public Product(Integer id, String name, Integer quantityAvailable, Supplier supplier, Category category) {
+		this.id = id;
+		this.name = name;
+		this.quantityAvailable = quantityAvailable;
+		this.supplier = supplier;
+		this.category = category;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Integer getQuantityAvailable() {
+		return quantityAvailable;
+	}
+
+	public void setQuantityAvailable(Integer quantityAvailable) {
+		this.quantityAvailable = quantityAvailable;
+	}
+
+	public Supplier getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(Supplier supplier) {
+		this.supplier = supplier;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
 }

@@ -26,6 +26,9 @@ public class Product {
 	@Column(name = "name", nullable = false)
 	private String name;
 	
+	@Column(name = "quantity_available", nullable = false)
+	private Integer quantityAvailable;
+	
 	@ManyToOne
 	@JoinColumn(name = "supplier_id", nullable = false)
 	private Supplier supplier;

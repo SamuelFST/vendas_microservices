@@ -7,6 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.beans.BeanUtils;
+
+import com.vendas_microservices.productapi.modules.supplier.dto.SupplierRequest;
+
 @Entity
 @Table(name = "suppliers")
 public class Supplier {
@@ -24,7 +28,13 @@ public class Supplier {
 		this.id = id;
 		this.name = name;
 	}
-
+	
+	public static Supplier of(SupplierRequest request) {
+		Supplier supplier = new Supplier();
+		BeanUtils.copyProperties(request, supplier);
+		return supplier;
+	}
+	
 	public Integer getId() {
 		return id;
 	}

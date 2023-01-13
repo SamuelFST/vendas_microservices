@@ -1,8 +1,8 @@
-package com.vendas_microservices.productapi.modules.product.dto;
+package com.vendas_microservices.productapi.modules.category.dto;
 
 import org.springframework.beans.BeanUtils;
 
-import com.vendas_microservices.productapi.modules.product.model.Category;
+import com.vendas_microservices.productapi.modules.category.model.Category;
 
 public class CategoryResponse {
 	

@@ -1,4 +1,4 @@
-package com.vendas_microservices.productapi.modules.product.model;
+package com.vendas_microservices.productapi.modules.supplier.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,13 +1,13 @@
-package com.vendas_microservices.productapi.modules.product.service;
+package com.vendas_microservices.productapi.modules.category.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vendas_microservices.productapi.config.exception.ValidationException;
-import com.vendas_microservices.productapi.modules.product.dto.CategoryRequest;
-import com.vendas_microservices.productapi.modules.product.dto.CategoryResponse;
-import com.vendas_microservices.productapi.modules.product.model.Category;
-import com.vendas_microservices.productapi.modules.product.repository.CategoryRepository;
+import com.vendas_microservices.productapi.modules.category.model.Category;
+import com.vendas_microservices.productapi.modules.category.repository.CategoryRepository;
+import com.vendas_microservices.productapi.modules.category.dto.CategoryRequest;
+import com.vendas_microservices.productapi.modules.category.dto.CategoryResponse;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 

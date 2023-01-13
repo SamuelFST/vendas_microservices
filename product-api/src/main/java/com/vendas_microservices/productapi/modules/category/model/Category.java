@@ -1,4 +1,4 @@
-package com.vendas_microservices.productapi.modules.product.model;
+package com.vendas_microservices.productapi.modules.category.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 import org.springframework.beans.BeanUtils;
 
-import com.vendas_microservices.productapi.modules.product.dto.CategoryRequest;
+import com.vendas_microservices.productapi.modules.category.dto.CategoryRequest;
 
 @Entity
 @Table(name = "categories")

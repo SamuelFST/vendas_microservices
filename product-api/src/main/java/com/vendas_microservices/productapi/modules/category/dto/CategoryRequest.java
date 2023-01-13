@@ -1,4 +1,4 @@
-package com.vendas_microservices.productapi.modules.product.dto;
+package com.vendas_microservices.productapi.modules.category.dto;
 
 public class CategoryRequest {
 	

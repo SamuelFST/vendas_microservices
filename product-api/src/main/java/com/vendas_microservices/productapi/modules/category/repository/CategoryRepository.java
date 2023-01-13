@@ -1,8 +1,8 @@
-package com.vendas_microservices.productapi.modules.product.repository;
+package com.vendas_microservices.productapi.modules.category.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.vendas_microservices.productapi.modules.product.model.Category;
+import com.vendas_microservices.productapi.modules.category.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 	boolean existsByDescription(String description);

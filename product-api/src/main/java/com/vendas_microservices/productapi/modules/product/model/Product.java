@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.vendas_microservices.productapi.modules.category.model.Category;
+import com.vendas_microservices.productapi.modules.supplier.model.Supplier;
+
 @Entity
 @Table(name = "products")
 public class Product {

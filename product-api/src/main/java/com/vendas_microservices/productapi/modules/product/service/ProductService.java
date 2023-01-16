@@ -2,6 +2,10 @@ package com.vendas_microservices.productapi.modules.product.service;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,50 @@ public class ProductService {
 	private SupplierService supplierService;
 	@Autowired
 	private CategoryService categoryService;
+	
+	public List<ProductResponse> findAll(String name) {
+		List<Product> products = new ArrayList<Product>();
+		
+		if (isEmpty(name)) {
+			products.addAll(productRepository.findAll());
+		} else {
+			products.addAll(productRepository.findAllByNameLikeIgnoreCase("%"+ name +"%"));
+		}
+		
+		return products
+				.stream()
+				.map(product -> ProductResponse.of(product))
+				.collect(Collectors.toList());
+	}
+	
+	public List<ProductResponse> findAllBySupplierId(Integer id) {
+		if (isEmpty(id)) {
+			throw new ValidationException("The product supplier id must be informed");
+		}
+
+		return productRepository
+				.findAllBySupplierId(id)
+				.stream()
+				.map(product -> ProductResponse.of(product))
+				.collect(Collectors.toList());
+	}
+	
+	public List<ProductResponse> findAllByCategoryId(Integer id) {
+		if (isEmpty(id)) {
+			throw new ValidationException("The product category id must be informed");
+		}
+		
+		return productRepository
+				.findAllByCategoryId(id)
+				.stream()
+				.map(product -> ProductResponse.of(product))
+				.collect(Collectors.toList());
+	}
+	
+	
+	public ProductResponse findByIdResponse(Integer id) {
+		return ProductResponse.of(findById(id));
+	}
 	
 	public ProductResponse save(ProductRequest request) {
 		validateProductDataInformed(request);
@@ -53,5 +101,13 @@ public class ProductService {
 		if (isEmpty(request.getSupplierId())) {
 			throw new ValidationException("The supplier id was not informed");
 		}
+	}
+	
+	public Product findById(Integer id) {
+		if (isEmpty(id)) {
+			throw new ValidationException("The product id was not informed");
+		}
+		
+		return productRepository.findById(id).orElseThrow(() -> new ValidationException("No product with id " +id));
 	}
 }

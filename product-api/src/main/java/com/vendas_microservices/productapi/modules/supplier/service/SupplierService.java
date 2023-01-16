@@ -2,6 +2,10 @@ package com.vendas_microservices.productapi.modules.supplier.service;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,25 @@ public class SupplierService {
 	
 	@Autowired
 	private SupplierRepository supplierRepository;
+	
+	public List<SupplierResponse> findAll(String name) {
+		List<Supplier> suppliers = new ArrayList<Supplier>();
+		
+		if (isEmpty(name)) {
+			suppliers.addAll(supplierRepository.findAll());
+		} else {
+			suppliers.addAll(supplierRepository.findAllByNameLikeIgnoreCase("%"+ name +"%"));
+		}
+		
+		return suppliers
+				.stream()
+				.map(supplier -> SupplierResponse.of(supplier))
+				.collect(Collectors.toList());
+	}
+	
+	public SupplierResponse findByIdResponse(Integer id) {
+		return SupplierResponse.of(findById(id));
+	}
 	
 	public SupplierResponse save(SupplierRequest request) {
 		validateSupplierNameInformed(request);
@@ -32,8 +55,11 @@ public class SupplierService {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	public Supplier findById(Integer id) {
+		if (isEmpty(id)) {
+			throw new ValidationException("The supplier id was not informed");
+		}
+		
 		return supplierRepository.findById(id).orElseThrow(() -> new ValidationException("No supplier with id " +id));
 	}
 }

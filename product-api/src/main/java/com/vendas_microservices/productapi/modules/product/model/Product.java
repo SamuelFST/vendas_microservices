@@ -1,5 +1,7 @@
 package com.vendas_microservices.productapi.modules.product.model;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,9 +9,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import com.vendas_microservices.productapi.modules.category.model.Category;
+import com.vendas_microservices.productapi.modules.product.dto.ProductRequest;
 import com.vendas_microservices.productapi.modules.supplier.model.Supplier;
 
 @Entity
@@ -24,7 +28,7 @@ public class Product {
 	
 	@Column(name = "quantity_available", nullable = false)
 	private Integer quantityAvailable;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "supplier_id", nullable = false)
 	private Supplier supplier;
@@ -33,6 +37,14 @@ public class Product {
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+	
+	@PrePersist
+	public void prePersist() {
+		createdAt = LocalDateTime.now();
+	}
+	
 	public Product() {
 	}
 
@@ -42,6 +54,15 @@ public class Product {
 		this.quantityAvailable = quantityAvailable;
 		this.supplier = supplier;
 		this.category = category;
+	}
+	
+	public static Product of(ProductRequest request, Supplier supplier, Category category) {
+		Product product = new Product();
+		product.setName(request.getName());
+		product.setQuantityAvailable(request.getQuantityAvailable());
+		product.setSupplier(supplier);
+		product.setCategory(category);
+		return product;
 	}
 
 	public Integer getId() {
@@ -82,5 +103,13 @@ public class Product {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 }

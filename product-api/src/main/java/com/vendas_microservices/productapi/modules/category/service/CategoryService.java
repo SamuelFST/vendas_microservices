@@ -2,6 +2,10 @@ package com.vendas_microservices.productapi.modules.category.service;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,25 @@ public class CategoryService {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	public List<CategoryResponse> findAll(String description) {
+		List<Category> categories = new ArrayList<Category>();
+		
+		if (isEmpty(description)) {
+			categories.addAll(categoryRepository.findAll());
+		} else {
+			categories.addAll(categoryRepository.findAllByDescriptionLikeIgnoreCase("%"+ description +"%"));
+		}
+		
+		return categories
+				.stream()
+				.map(category -> CategoryResponse.of(category))
+				.collect(Collectors.toList());
+	}
+	
+	public CategoryResponse findByIdResponse(Integer id) {
+		return CategoryResponse.of(findById(id));
+	}
 	
 	public CategoryResponse save(CategoryRequest request) {
 		validateCategoryNameInformed(request);
@@ -32,8 +55,11 @@ public class CategoryService {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	public Category findById(Integer id) {
+		if (isEmpty(id)) {
+			throw new ValidationException("The category id was not informed");
+		}
+		
 		return categoryRepository.findById(id).orElseThrow(() -> new ValidationException("No category with id " +id));
 	}
 }

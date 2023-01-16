@@ -31,4 +31,9 @@ public class SupplierService {
 			throw new ValidationException("A supplier with this name already exists");
 		}
 	}
+	
+	@SuppressWarnings("unused")
+	public Supplier findById(Integer id) {
+		return supplierRepository.findById(id).orElseThrow(() -> new ValidationException("No supplier with id " +id));
+	}
 }

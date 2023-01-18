@@ -50,6 +50,16 @@ public class CategoryService {
 		return CategoryResponse.of(category);
 	}
 	
+	public CategoryResponse update(CategoryRequest request, Integer id) {
+		validateCategoryNameInformed(request);
+		validateInformedId(id);
+		Category category = Category.of(request);
+		category.setId(id);
+		categoryRepository.save(category);
+		return CategoryResponse.of(category);
+	}
+	
+	
 	public SuccessResponse delete(Integer id) {
 		validateInformedId(id);
 		

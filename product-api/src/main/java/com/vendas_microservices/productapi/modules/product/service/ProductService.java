@@ -83,6 +83,18 @@ public class ProductService {
 		return ProductResponse.of(product);	
 	}
 	
+	public ProductResponse update(ProductRequest request, Integer id) {
+		validateProductDataInformed(request);
+		validateInformedId(id);
+		validateCategoryAndSupplierIdInformed(request);
+		Category category = categoryService.findById(request.getCategoryId());
+		Supplier supplier = supplierService.findById(request.getSupplierId());
+		Product product = Product.of(request, supplier, category);
+		product.setId(id);
+		productRepository.save(product);
+		return ProductResponse.of(product);
+	}
+	
 	public SuccessResponse delete(Integer id) {
 		validateInformedId(id);
 		productRepository.deleteById(id);

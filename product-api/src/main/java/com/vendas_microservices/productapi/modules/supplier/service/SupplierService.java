@@ -50,6 +50,15 @@ public class SupplierService {
 		return SupplierResponse.of(supplier);
 	}
 	
+	public SupplierResponse update(SupplierRequest request, Integer id) {
+		validateSupplierNameInformed(request);
+		validateInformedId(id);
+		Supplier supplier = Supplier.of(request);
+		supplier.setId(id);
+		supplierRepository.save(supplier);
+		return SupplierResponse.of(supplier);
+	}
+	
 	public SuccessResponse delete(Integer id) {
 		validateInformedId(id);
 		

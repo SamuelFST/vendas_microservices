@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vendas_microservices.productapi.config.SuccessResponse;
 import com.vendas_microservices.productapi.config.exception.ValidationException;
+import com.vendas_microservices.productapi.modules.product.service.ProductService;
 import com.vendas_microservices.productapi.modules.supplier.dto.SupplierRequest;
 import com.vendas_microservices.productapi.modules.supplier.dto.SupplierResponse;
 import com.vendas_microservices.productapi.modules.supplier.model.Supplier;
@@ -20,6 +22,8 @@ public class SupplierService {
 	
 	@Autowired
 	private SupplierRepository supplierRepository;
+	@Autowired
+	private ProductService productService;
 	
 	public List<SupplierResponse> findAll(String name) {
 		List<Supplier> suppliers = new ArrayList<Supplier>();
@@ -46,6 +50,17 @@ public class SupplierService {
 		return SupplierResponse.of(supplier);
 	}
 	
+	public SuccessResponse delete(Integer id) {
+		validateInformedId(id);
+		
+		if (productService.existsBySupplierId(id)) {
+			throw new ValidationException("Cannot delete this supplier because it is already used by a product");
+		}
+		
+		supplierRepository.deleteById(id);
+		return SuccessResponse.create("The supplier with id "+id +" was deleted");
+	}
+	
 	private void validateSupplierNameInformed(SupplierRequest request) {
 		if (isEmpty(request.getName())) {
 			throw new ValidationException("The supplier name was not informed");
@@ -55,11 +70,14 @@ public class SupplierService {
 		}
 	}
 	
-	public Supplier findById(Integer id) {
+	private void validateInformedId(Integer id) {
 		if (isEmpty(id)) {
 			throw new ValidationException("The supplier id was not informed");
 		}
-		
+	}
+	
+	public Supplier findById(Integer id) {
+		validateInformedId(id);
 		return supplierRepository.findById(id).orElseThrow(() -> new ValidationException("No supplier with id " +id));
 	}
 }

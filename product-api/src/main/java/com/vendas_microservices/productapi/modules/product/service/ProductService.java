@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vendas_microservices.productapi.config.SuccessResponse;
 import com.vendas_microservices.productapi.config.exception.ValidationException;
 import com.vendas_microservices.productapi.modules.category.model.Category;
 import com.vendas_microservices.productapi.modules.category.service.CategoryService;
@@ -82,6 +83,12 @@ public class ProductService {
 		return ProductResponse.of(product);	
 	}
 	
+	public SuccessResponse delete(Integer id) {
+		validateInformedId(id);
+		productRepository.deleteById(id);
+		return SuccessResponse.create("The product with id "+id +" was deleted");
+	}
+	
 	private void validateProductDataInformed(ProductRequest request) {
 		if (isEmpty(request.getName())) {
 			throw new ValidationException("The product name was not informed");
@@ -103,11 +110,22 @@ public class ProductService {
 		}
 	}
 	
-	public Product findById(Integer id) {
+	private void validateInformedId(Integer id) {
 		if (isEmpty(id)) {
 			throw new ValidationException("The product id was not informed");
 		}
-		
+	}
+	
+	public Product findById(Integer id) {
+		validateInformedId(id);
 		return productRepository.findById(id).orElseThrow(() -> new ValidationException("No product with id " +id));
+	}
+	
+	public boolean existsByCategoryId(Integer id) {
+		return productRepository.existsByCategoryId(id);
+	}
+	
+	public boolean existsBySupplierId(Integer id) {
+		return productRepository.existsBySupplierId(id);
 	}
 }

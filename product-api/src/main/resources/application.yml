@@ -20,8 +20,9 @@ spring:
   jpa:
     show_sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format-sql: true
-          
+  main:
+    allow-circular-references: true       

@@ -24,10 +24,28 @@ spring:
     properties:
       hibernate:
         format-sql: true
+        
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+  
   main:
-    allow-circular-references: true       
+    allow-circular-references: true    
+    allow-bean-definition-overriding: true   
 
 app-config:
   secrets:
     SECRET_KEY: ${SECRET_KEY:YXV0aC1hcGktc2VjcmV0LWtleS0xMjM0NTY3ODkxMA==}
+    
+  rabbit:
+    exchange:
+      product: product.topic     
+    routingKey:
+      product-stock: product-stock-update.routingKey
+      sales-confirmation: sales-confirmation.routingKey
+    queue:
+      product-stock: product-stock-update.queue
+      sales-confirmation: sales-confirmation.queue
     

@@ -2,7 +2,6 @@ package com.vendas_microservices.productapi.modules.jwt.service;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,26 +14,24 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-	
-	private static final String BEARER = "bearer ";
-	
+		
 	@Value("${app-config.secrets.SECRET_KEY}")
 	private String apiSecret;
 	
 	public void validateAuthorization(String token) {
+		String accessToken = extractToken(token);
 		try {
-			String accessToken = extractToken(token);
 			Claims claims = Jwts
 					.parserBuilder()
 					.setSigningKey(Keys.hmacShaKeyFor(apiSecret.getBytes()))
 					.build()
-					.parseClaimsJwt(accessToken)
+					.parseClaimsJws(accessToken)
 					.getBody();
 			
 			JwtResponse user = JwtResponse.getUser(claims);
 			
 			if (isEmpty(user) || isEmpty(user.getId())) {
-				throw new AuthenticationException("Invalid user token");
+				throw new AuthenticationException("Invalid token");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -46,8 +43,8 @@ public class JwtService {
 		if (isEmpty(token)) {
 			throw new AuthenticationException("Access token was not informed");
 		}
-		if (token.toLowerCase().contains(BEARER)) {
-			return token.replace(BEARER, Strings.EMPTY);
+		if (token.contains(" ")) {
+			return token.split(" ")[1];
 		}
 		
 		return token;

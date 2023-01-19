@@ -1,5 +1,7 @@
 package com.vendas_microservices.productapi.modules.jwt.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.jsonwebtoken.Claims;
 
 public class JwtResponse {
@@ -43,12 +45,7 @@ public class JwtResponse {
 	
 	public static JwtResponse getUser(Claims jwtClaims) {
 		try {
-			JwtResponse response = new JwtResponse();
-			response.setId((Integer) jwtClaims.get("id"));
-			response.setName((String) jwtClaims.get("name"));
-			response.setEmail((String) jwtClaims.get("email"));
-			
-			return response;
+			return new ObjectMapper().convertValue(jwtClaims.get("authUser"), JwtResponse.class);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;

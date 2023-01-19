@@ -26,3 +26,8 @@ spring:
         format-sql: true
   main:
     allow-circular-references: true       
+
+app-config:
+  secrets:
+    SECRET_KEY: ${SECRET_KEY:YXV0aC1hcGktc2VjcmV0LWtleS0xMjM0NTY3ODkxMA==}
+    

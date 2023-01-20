@@ -6,8 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vendas_microservices.productapi.config.SuccessResponse;
 import com.vendas_microservices.productapi.config.exception.ValidationException;
@@ -15,8 +19,12 @@ import com.vendas_microservices.productapi.modules.category.model.Category;
 import com.vendas_microservices.productapi.modules.category.service.CategoryService;
 import com.vendas_microservices.productapi.modules.product.dto.ProductRequest;
 import com.vendas_microservices.productapi.modules.product.dto.ProductResponse;
+import com.vendas_microservices.productapi.modules.product.dto.ProductStockDTO;
 import com.vendas_microservices.productapi.modules.product.model.Product;
 import com.vendas_microservices.productapi.modules.product.repository.ProductRepository;
+import com.vendas_microservices.productapi.modules.sales.dto.SaleConfirmationDTO;
+import com.vendas_microservices.productapi.modules.sales.enums.SaleStatus;
+import com.vendas_microservices.productapi.modules.sales.rabbitmq.SalesConfirmationSender;
 import com.vendas_microservices.productapi.modules.supplier.model.Supplier;
 import com.vendas_microservices.productapi.modules.supplier.service.SupplierService;
 
@@ -29,6 +37,10 @@ public class ProductService {
 	private SupplierService supplierService;
 	@Autowired
 	private CategoryService categoryService;
+	@Autowired
+	private SalesConfirmationSender salesConfirmationSender;
+	@PersistenceContext
+	EntityManager entityManager;
 	
 	public List<ProductResponse> findAll(String name) {
 		List<Product> products = new ArrayList<Product>();
@@ -139,5 +151,59 @@ public class ProductService {
 	
 	public boolean existsBySupplierId(Integer id) {
 		return productRepository.existsBySupplierId(id);
+	}
+	
+	@Transactional
+	public void updateProductStock(ProductStockDTO product) {
+		try {
+			validateStockUpdateData(product);
+			List<Product> productsForUpdate = new ArrayList<Product>();
+			
+			product
+				.getProducts()
+				.forEach(saleProduct -> {
+					Product existingProduct = findById(saleProduct.getProductId());
+					entityManager.detach(existingProduct);
+					
+					if (saleProduct.getQuantity() > existingProduct.getQuantityAvailable() 
+							|| existingProduct.getQuantityAvailable() - saleProduct.getQuantity() < 0) {
+						productsForUpdate.clear();
+						throw new ValidationException(
+							String.format("The product stock of id %s can't be updated or it's out of stock", existingProduct.getId())
+						);
+					}
+					
+					existingProduct.updateQuantity(saleProduct.getQuantity());
+					productsForUpdate.add(existingProduct);
+				});
+			
+			if (!isEmpty(productsForUpdate)) {
+				productRepository.saveAll(productsForUpdate);
+				
+				SaleConfirmationDTO approvedMessage = new SaleConfirmationDTO(product.getSalesId(), SaleStatus.APPROVED);
+				salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
+			}
+		} catch (Exception ex) {
+			System.out.println("Error while trying to update stock for message: " +ex.getMessage());
+			SaleConfirmationDTO rejectedMessage = new SaleConfirmationDTO(product.getSalesId(), SaleStatus.REJECTED);
+			salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
+		}
+	}
+	
+	private void validateStockUpdateData(ProductStockDTO productStockDTO) {
+		if (isEmpty(productStockDTO) || isEmpty(productStockDTO.getSalesId())) {
+			throw new ValidationException("The product data or sales id cannot be null");
+		}
+		if (isEmpty(productStockDTO.getProducts())) {
+			throw new ValidationException("A sale must have at least 1 product to be processed");
+		}
+		
+		productStockDTO
+			.getProducts()
+			.forEach(saleProduct -> {
+				if (isEmpty(saleProduct.getQuantity()) || isEmpty(saleProduct.getProductId())) {
+					throw new ValidationException("The product id and the quantity must be informed");
+				}
+			});
 	}
 }

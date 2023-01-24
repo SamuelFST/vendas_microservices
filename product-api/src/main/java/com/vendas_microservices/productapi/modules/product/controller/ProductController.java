@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vendas_microservices.productapi.config.SuccessResponse;
 import com.vendas_microservices.productapi.modules.product.dto.ProductRequest;
 import com.vendas_microservices.productapi.modules.product.dto.ProductResponse;
+import com.vendas_microservices.productapi.modules.product.dto.ProductSalesResponse;
 import com.vendas_microservices.productapi.modules.product.service.ProductService;
 
 @RestController
@@ -33,6 +34,11 @@ public class ProductController {
 	@GetMapping("/{id}")
 	public ProductResponse findById(@PathVariable Integer id) {
 		return productService.findByIdResponse(id);
+	}
+	
+	@GetMapping("/{id}/sales")
+	public ProductSalesResponse findAllProductSales(@PathVariable Integer id) {
+		return productService.findAllSalesByProductId(id);
 	}
 	
 	@GetMapping("/category/{id}")

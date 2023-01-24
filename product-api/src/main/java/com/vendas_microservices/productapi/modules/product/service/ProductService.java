@@ -19,10 +19,13 @@ import com.vendas_microservices.productapi.modules.category.model.Category;
 import com.vendas_microservices.productapi.modules.category.service.CategoryService;
 import com.vendas_microservices.productapi.modules.product.dto.ProductRequest;
 import com.vendas_microservices.productapi.modules.product.dto.ProductResponse;
+import com.vendas_microservices.productapi.modules.product.dto.ProductSalesResponse;
 import com.vendas_microservices.productapi.modules.product.dto.ProductStockDTO;
 import com.vendas_microservices.productapi.modules.product.model.Product;
 import com.vendas_microservices.productapi.modules.product.repository.ProductRepository;
+import com.vendas_microservices.productapi.modules.sales.client.SalesClient;
 import com.vendas_microservices.productapi.modules.sales.dto.SaleConfirmationDTO;
+import com.vendas_microservices.productapi.modules.sales.dto.SalesProductListResponse;
 import com.vendas_microservices.productapi.modules.sales.enums.SaleStatus;
 import com.vendas_microservices.productapi.modules.sales.rabbitmq.SalesConfirmationSender;
 import com.vendas_microservices.productapi.modules.supplier.model.Supplier;
@@ -39,6 +42,8 @@ public class ProductService {
 	private CategoryService categoryService;
 	@Autowired
 	private SalesConfirmationSender salesConfirmationSender;
+	@Autowired
+	private SalesClient salesClient;
 	@PersistenceContext
 	EntityManager entityManager;
 	
@@ -205,5 +210,17 @@ public class ProductService {
 					throw new ValidationException("The product id and the quantity must be informed");
 				}
 			});
+	}
+	
+	public ProductSalesResponse findAllSalesByProductId(Integer id) {
+		Product product = findById(id);
+		try {
+			SalesProductListResponse salesList = salesClient
+					.findAllSalesByProductId(product.getId())
+					.orElseThrow(() -> new ValidationException("No sales found for this product"));
+			return ProductSalesResponse.of(product, salesList.getSalesIds());
+		} catch (Exception ex) {
+			throw new ValidationException("An error occurred when trying to get the product sales");
+		}
 	}
 }

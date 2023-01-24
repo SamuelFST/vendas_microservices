@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vendas_microservices.productapi.config.SuccessResponse;
+import com.vendas_microservices.productapi.modules.product.dto.ProductCheckStockRequest;
 import com.vendas_microservices.productapi.modules.product.dto.ProductRequest;
 import com.vendas_microservices.productapi.modules.product.dto.ProductResponse;
 import com.vendas_microservices.productapi.modules.product.dto.ProductSalesResponse;
@@ -54,6 +55,11 @@ public class ProductController {
 	@PostMapping("")
 	public ProductResponse save(@RequestBody ProductRequest request) {
 		return productService.save(request);
+	}
+	
+	@PostMapping("/stock")
+	public SuccessResponse checkProductsStock(@RequestBody ProductCheckStockRequest request) {
+		return productService.checkProductsStock(request);
 	}
 	
 	@PutMapping("/{id}")

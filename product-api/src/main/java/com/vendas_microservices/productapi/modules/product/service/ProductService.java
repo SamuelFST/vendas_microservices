@@ -17,6 +17,8 @@ import com.vendas_microservices.productapi.config.SuccessResponse;
 import com.vendas_microservices.productapi.config.exception.ValidationException;
 import com.vendas_microservices.productapi.modules.category.model.Category;
 import com.vendas_microservices.productapi.modules.category.service.CategoryService;
+import com.vendas_microservices.productapi.modules.product.dto.ProductCheckStockRequest;
+import com.vendas_microservices.productapi.modules.product.dto.ProductQuantityDTO;
 import com.vendas_microservices.productapi.modules.product.dto.ProductRequest;
 import com.vendas_microservices.productapi.modules.product.dto.ProductResponse;
 import com.vendas_microservices.productapi.modules.product.dto.ProductSalesResponse;
@@ -221,6 +223,30 @@ public class ProductService {
 			return ProductSalesResponse.of(product, salesList.getSalesIds());
 		} catch (Exception ex) {
 			throw new ValidationException("An error occurred when trying to get the product sales");
+		}
+	}
+	
+	public SuccessResponse checkProductsStock(ProductCheckStockRequest request) {
+		if (isEmpty(request) || isEmpty(request.getProducts())) {
+			throw new ValidationException("The products list must not be empty");
+		}
+		
+		request
+			.getProducts()
+			.forEach(this::validateStock);
+		
+		return SuccessResponse.create("All the products in the given list have available stock");
+	}
+	
+	private void validateStock(ProductQuantityDTO productQuantity) {
+		if (isEmpty(productQuantity.getProductId()) || isEmpty(productQuantity.getQuantity())) {
+			throw new ValidationException("The product id and quantity must be informed for all products in the list");
+		}
+		
+		Product product = findById(productQuantity.getProductId());
+		
+		if (productQuantity.getQuantity() > product.getQuantityAvailable()) {
+			throw new ValidationException(String.format("The product %s is out of stock", product.getId()));
 		}
 	}
 }

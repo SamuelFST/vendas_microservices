@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import secrets from '../constants/secrets/secrets';
+import secrets from '../constants/secrets';
 
 export default function connect() {
   mongoose.connect(secrets.MONGO_URL, {

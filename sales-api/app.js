@@ -5,11 +5,14 @@ dotenv.config();
 
 import connect from './src/config/db/mongoConfig';
 import createInitialData from './src/config/db/initialData';
+import authenticated from './src/middlewares/auth/authenticated';
 
 const app = express();
 
 connect();
 createInitialData();
+
+app.use(authenticated);
 
 app.get('/api/status', (req, res) => {
   return res.status(200).json({

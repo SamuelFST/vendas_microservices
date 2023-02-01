@@ -2,8 +2,8 @@ import amqp from 'amqplib/callback_api';
 import queueSpecs from './queue';
 import secrets from '../constants/secrets';
 
-function createQueue(connection, queue, routingKey, topic) {
-  connection.createChannel((error, channel) => {
+async function createQueue(connection, queue, routingKey, topic) {
+  await connection.createChannel((error, channel) => {
     if (error) {
       throw new Error(error);
     }
@@ -14,11 +14,13 @@ function createQueue(connection, queue, routingKey, topic) {
   });
 }
 
-export default async function connectRabbitMq() {
+async function connectRabbitMqAndCreateQueues() {
   amqp.connect(secrets.RABBIT_URL, (error, connection) => {
     if (error) {
       throw new Error(error);
     }
+
+    console.info('Starting RabbitMq');
 
     createQueue(
       connection,
@@ -34,8 +36,23 @@ export default async function connectRabbitMq() {
       queueSpecs.PRODUCT_TOPIC,
     );
 
+    console.info('Queues and topics created');
+
     setTimeout(() => {
       connection.close();
     }, 500);
   });
+}
+
+export default async function connectRabbitMq() {
+  const env = process.env.NODE_ENV;
+  console.log('env: ', env);
+  if (env === 'container') {
+    console.info('Waiting for rabbitMq start');
+    setInterval(() => {
+      connectRabbitMqAndCreateQueues();
+    }, 30000);
+  } else {
+    connectRabbitMqAndCreateQueues();
+  }
 }

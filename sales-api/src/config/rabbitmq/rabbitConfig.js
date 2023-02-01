@@ -1,6 +1,7 @@
 import amqp from 'amqplib/callback_api';
 import queueSpecs from './queue';
 import secrets from '../constants/secrets';
+import listenToSalesConfirmationQueue from '../../modules/sales/rabbitmq/salesConfirmationListener';
 
 async function createQueue(connection, queue, routingKey, topic) {
   await connection.createChannel((error, channel) => {
@@ -40,8 +41,12 @@ async function connectRabbitMqAndCreateQueues() {
 
     setTimeout(() => {
       connection.close();
-    }, 500);
+    }, 2000);
   });
+
+  setTimeout(() => {
+    listenToSalesConfirmationQueue();
+  }, 2000);
 }
 
 export default async function connectRabbitMq() {

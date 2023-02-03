@@ -1,6 +1,7 @@
 import amqp from 'amqplib/callback_api';
 import secrets from '../../../config/constants/secrets';
 import queueSpecs from '../../../config/rabbitmq/queue';
+import OrderService from '../service/OrderService';
 
 const { RABBIT_URL } = secrets;
 const { SALES_CONFIRMATION_QUEUE } = queueSpecs;
@@ -20,6 +21,7 @@ export default function listenToSalesConfirmationQueue() {
 
       channel.consume(SALES_CONFIRMATION_QUEUE, (message) => {
         console.info(`Receiving message from queue: ${message.content.toString()}`);
+        OrderService.updateOrder(message);
       }, {
         noAck: true,
       });

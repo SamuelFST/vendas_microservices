@@ -5,14 +5,42 @@ import httpStatus from '../../../config/constants/httpStatus';
 import orderStatus from '../status/OrderStatus';
 import ProductClient from '../../product/client/ProductClient';
 
-const { INTERNAL_SERVER_ERROR, SUCCESS, BAD_REQUEST } = httpStatus;
+const {
+  INTERNAL_SERVER_ERROR,
+  SUCCESS,
+  BAD_REQUEST,
+  NOT_FOUND,
+} = httpStatus;
 const { PENDING } = orderStatus;
 
 class OrderService {
+  async findById(req) {
+    try {
+      const { id } = req.params;
+      this.validateInformedId(id);
+
+      const order = await OrderRepository.findById(id);
+
+      if (!order) {
+        throw new OrderException(NOT_FOUND, `A order with id ${id} don't exist`);
+      }
+
+      return {
+        status: SUCCESS,
+        order,
+      };
+    } catch (error) {
+      return {
+        status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+        message: error.message,
+      };
+    }
+  }
+
   async createOrder(req) {
     try {
       const orderData = req.body;
-      const { authUser } = req;
+      const { userId, userName, userEmail } = req;
       const { authorization } = req.headers;
 
       this.validateOrderData(orderData);
@@ -20,8 +48,12 @@ class OrderService {
 
       const order = {
         status: PENDING,
-        user: authUser,
-        products: orderData,
+        user: {
+          id: userId,
+          name: userName,
+          email: userEmail,
+        },
+        products: orderData.products,
       };
 
       const createdOrder = await OrderRepository.save(order);
@@ -76,6 +108,12 @@ class OrderService {
 
     if (!isStockAvailable) {
       throw new OrderException(BAD_REQUEST, 'The stock is out');
+    }
+  }
+
+  validateInformedId(id) {
+    if (!id) {
+      throw new OrderException(BAD_REQUEST, 'Order id must be informed');
     }
   }
 }

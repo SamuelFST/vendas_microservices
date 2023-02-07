@@ -14,7 +14,7 @@ class ProductCLient {
         Authorization: token,
       };
 
-      const response = await productApi.post('/products/stock', { headers }, products);
+      const response = await productApi.post('/products/stock', { products }, { headers });
 
       if (response) {
         return true;

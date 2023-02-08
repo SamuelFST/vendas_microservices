@@ -15,6 +15,6 @@ import com.vendas_microservices.productapi.modules.sales.dto.SalesProductListRes
 )
 public interface SalesClient {
 
-	@GetMapping("/products/{id}/sales")
+	@GetMapping("/api/orders/products/{id}")
 	Optional<SalesProductListResponse> findAllSalesByProductId(@PathVariable(value = "id") Integer id);
 }

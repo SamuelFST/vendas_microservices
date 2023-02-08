@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 
+import tracing from './src/middlewares/log/tracing';
 import initialData from './src/config/db/initialData';
 import userRoutes from './src/modules/user/routes/UserRoutes';
 import authRoutes from './src/modules/auth/routes/AuthRoutes';
@@ -12,7 +13,7 @@ const app = express();
 initialData();
 
 app.use(express.json());
-
+app.use(tracing);
 app.use(authRoutes);
 app.use(userRoutes);
 

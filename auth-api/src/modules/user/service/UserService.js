@@ -34,6 +34,15 @@ class UserService {
 
   async register(req) {
     try {
+      const { transactionid, serviceid } = req.headers;
+
+      console.info(
+        `Request to POST on register with data ${JSON.stringify(
+          req.body,
+          ['name', 'email'],
+        )} | [transactionID: ${transactionid} | serviceID: ${serviceid}]`,
+      );
+
       const {
         name,
         email,
@@ -43,7 +52,7 @@ class UserService {
       this.validateRegisterData(name, email, password);
       const user = await UserRepository.create(name, email, password);
 
-      return {
+      const response = {
         status: httpStatus.SUCCESS,
         user: {
           id: user.id,
@@ -51,6 +60,14 @@ class UserService {
           email: user.email,
         },
       };
+
+      console.info(
+        `Response to POST on register with data ${JSON.stringify(
+          response,
+        )} | [transactionID: ${transactionid} | serviceID: ${serviceid}]`,
+      );
+
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : httpStatus.INTERNAL_SERVER_ERROR,

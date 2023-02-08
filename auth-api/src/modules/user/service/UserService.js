@@ -32,6 +32,33 @@ class UserService {
     }
   }
 
+  async register(req) {
+    try {
+      const {
+        name,
+        email,
+        password,
+      } = req.body;
+
+      this.validateRegisterData(name, email, password);
+      const user = await UserRepository.create(name, email, password);
+
+      return {
+        status: httpStatus.SUCCESS,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      };
+    } catch (err) {
+      return {
+        status: err.status ? err.status : httpStatus.INTERNAL_SERVER_ERROR,
+        message: err.message,
+      };
+    }
+  }
+
   validateRequestData(email) {
     if (!email) {
       throw new UserException(
@@ -55,6 +82,15 @@ class UserService {
       throw new AuthException(
         httpStatus.FORBIDDEN,
         'You cannot see this user data',
+      );
+    }
+  }
+
+  validateRegisterData(name, email, password) {
+    if (!name || !email || !password) {
+      throw new UserException(
+        httpStatus.BAD_REQUEST,
+        'The user name, email and password are required fields',
       );
     }
   }

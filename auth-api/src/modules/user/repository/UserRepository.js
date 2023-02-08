@@ -18,6 +18,15 @@ class UserRepository {
       return null;
     }
   }
+
+  async create(name, email, password) {
+    try {
+      return await User.create({ name, email, password });
+    } catch (err) {
+      console.error(err.message);
+      return null;
+    }
+  }
 }
 
 export default new UserRepository();

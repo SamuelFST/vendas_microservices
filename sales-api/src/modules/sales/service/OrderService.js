@@ -14,6 +14,26 @@ const {
 const { PENDING } = orderStatus;
 
 class OrderService {
+  async findAll() {
+    try {
+      const orders = await OrderRepository.findAll();
+
+      if (!orders) {
+        throw new OrderException(SUCCESS, 'There are no sales');
+      }
+
+      return {
+        status: SUCCESS,
+        orders,
+      };
+    } catch (error) {
+      return {
+        status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+        message: error.message,
+      };
+    }
+  }
+
   async findById(req) {
     try {
       const { id } = req.params;
@@ -28,6 +48,28 @@ class OrderService {
       return {
         status: SUCCESS,
         order,
+      };
+    } catch (error) {
+      return {
+        status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+        message: error.message,
+      };
+    }
+  }
+
+  async findByProductId(req) {
+    try {
+      const { id } = req.params;
+      this.validateInformedProductId(id);
+      const orders = await OrderRepository.findByProductId(id);
+
+      if (!orders.length > 0) {
+        throw new OrderException(NOT_FOUND, `There are no sales with product id ${id}`);
+      }
+
+      return {
+        status: SUCCESS,
+        salesIds: orders.map((order) => order.id),
       };
     } catch (error) {
       return {
@@ -114,6 +156,12 @@ class OrderService {
   validateInformedId(id) {
     if (!id) {
       throw new OrderException(BAD_REQUEST, 'Order id must be informed');
+    }
+  }
+
+  validateInformedProductId(id) {
+    if (!id) {
+      throw new OrderException(BAD_REQUEST, 'The product id must be informed');
     }
   }
 }

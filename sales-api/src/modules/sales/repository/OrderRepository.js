@@ -19,6 +19,15 @@ class OrderRepository {
     }
   }
 
+  async findByProductId(id) {
+    try {
+      return await Order.find({ 'products.productId': Number(id) });
+    } catch (error) {
+      console.error(error.message);
+      return null;
+    }
+  }
+
   async save(order) {
     try {
       return await Order.create(order);

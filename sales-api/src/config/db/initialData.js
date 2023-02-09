@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import Order from '../../modules/sales/model/Order';
 
 export default async function createInitialData() {
@@ -24,6 +25,8 @@ export default async function createInitialData() {
       email: 'admin@mail.com',
     },
     status: 'APPROVED',
+    transactionid: uuidv4(),
+    serviceid: uuidv4(),
   });
 
   await Order.create({
@@ -43,5 +46,7 @@ export default async function createInitialData() {
       email: 'admin2@mail.com',
     },
     status: 'REJECTED',
+    transactionid: uuidv4(),
+    serviceid: uuidv4(),
   });
 }

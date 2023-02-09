@@ -14,6 +14,14 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    transactionid: {
+      type: String,
+      required: true,
+    },
+    serviceid: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

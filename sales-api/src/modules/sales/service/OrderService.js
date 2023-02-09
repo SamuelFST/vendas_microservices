@@ -144,6 +144,8 @@ class OrderService {
           email: userEmail,
         },
         products: orderData.products,
+        transactionid,
+        serviceid,
       };
 
       const createdOrder = await OrderRepository.save(order);

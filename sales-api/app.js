@@ -4,6 +4,7 @@ import express from 'express';
 dotenv.config();
 
 import connect from './src/config/db/mongoConfig';
+import tracing from './src/middlewares/log/tracing';
 import createInitialData from './src/config/db/initialData';
 import authenticated from './src/middlewares/auth/authenticated';
 import connectRabbitMq from './src/config/rabbitmq/rabbitConfig';
@@ -24,6 +25,7 @@ app.get('/api/status', (req, res) => {
 });
 
 app.use(express.json());
+app.use(tracing);
 app.use(authenticated);
 app.use(orderRouter);
 

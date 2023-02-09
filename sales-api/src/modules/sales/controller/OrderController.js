@@ -2,7 +2,7 @@ import OrderService from '../service/OrderService';
 
 class OrderController {
   async findAll(req, res) {
-    const orders = await OrderService.findAll();
+    const orders = await OrderService.findAll(req);
     return res.status(orders.status).json(orders);
   }
 

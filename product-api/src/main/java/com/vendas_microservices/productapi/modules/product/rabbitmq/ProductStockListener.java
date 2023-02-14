@@ -17,7 +17,11 @@ public class ProductStockListener {
 	@RabbitListener(queues = "${app-config.rabbit.queue.product-stock}")
 	public void receiveProductStockMessage(ProductStockDTO product) {
 		try {
-			System.out.println("Receiving message: " + new ObjectMapper().writeValueAsString(product));
+			System.out.printf(
+					"Receiving message from queue: %s | [transactionID: {%s}]\n", 
+					new ObjectMapper().writeValueAsString(product),
+					product.getTransactionid()
+			);
 			productService.updateProductStock(product);
 		} catch (Exception ex) {
 			System.out.println("Error while receiving message: " +ex);

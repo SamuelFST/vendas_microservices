@@ -6,13 +6,15 @@ public class SaleConfirmationDTO {
 
 	private String salesId;
 	private SaleStatus status;
+	private String transactionid;
 	
 	public SaleConfirmationDTO() {
 	}
 
-	public SaleConfirmationDTO(String salesId, SaleStatus status) {
+	public SaleConfirmationDTO(String salesId, SaleStatus status, String transactionid) {
 		this.salesId = salesId;
 		this.status = status;
+		this.transactionid = transactionid;
 	}
 
 	public String getSalesId() {
@@ -29,5 +31,13 @@ public class SaleConfirmationDTO {
 
 	public void setStatus(SaleStatus status) {
 		this.status = status;
+	}
+
+	public String getTransactionid() {
+		return transactionid;
+	}
+
+	public void setTransactionid(String transactionid) {
+		this.transactionid = transactionid;
 	}
 }

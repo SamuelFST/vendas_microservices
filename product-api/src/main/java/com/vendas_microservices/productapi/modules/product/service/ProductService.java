@@ -1,6 +1,7 @@
 package com.vendas_microservices.productapi.modules.product.service;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
+import static com.vendas_microservices.productapi.config.RequestUtil.getCurrentRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +9,13 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vendas_microservices.productapi.config.SuccessResponse;
 import com.vendas_microservices.productapi.config.exception.ValidationException;
 import com.vendas_microservices.productapi.modules.category.model.Category;
@@ -36,6 +39,9 @@ import com.vendas_microservices.productapi.modules.supplier.service.SupplierServ
 @Service
 public class ProductService {
 	
+	private static final String SERVICE_ID = "serviceid";
+	private static final String TRANSACTION_ID = "transactionid";
+	
 	@Autowired
 	private ProductRepository productRepository;
 	@Autowired
@@ -46,6 +52,8 @@ public class ProductService {
 	private SalesConfirmationSender salesConfirmationSender;
 	@Autowired
 	private SalesClient salesClient;
+	@Autowired
+	private ObjectMapper objectMapper;
 	@PersistenceContext
 	EntityManager entityManager;
 	
@@ -187,12 +195,12 @@ public class ProductService {
 			if (!isEmpty(productsForUpdate)) {
 				productRepository.saveAll(productsForUpdate);
 				
-				SaleConfirmationDTO approvedMessage = new SaleConfirmationDTO(product.getSalesId(), SaleStatus.APPROVED);
+				SaleConfirmationDTO approvedMessage = new SaleConfirmationDTO(product.getSalesId(), SaleStatus.APPROVED, product.getTransactionid());
 				salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
 			}
 		} catch (Exception ex) {
 			System.out.println("Error while trying to update stock for message: " +ex.getMessage());
-			SaleConfirmationDTO rejectedMessage = new SaleConfirmationDTO(product.getSalesId(), SaleStatus.REJECTED);
+			SaleConfirmationDTO rejectedMessage = new SaleConfirmationDTO(product.getSalesId(), SaleStatus.REJECTED, product.getTransactionid());
 			salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
 		}
 	}
@@ -217,25 +225,73 @@ public class ProductService {
 	public ProductSalesResponse findAllSalesByProductId(Integer id) {
 		Product product = findById(id);
 		try {
+			HttpServletRequest currentRequest = getCurrentRequest();
+			String transactionid = currentRequest.getHeader(TRANSACTION_ID);
+			Object serviceid = currentRequest.getAttribute(SERVICE_ID);
+			
+			System.out.printf(
+					"Sending request to Sales-API find sales by product ID %s | [transactionID: %s | serviceID: %s]\n",
+					id,
+					transactionid,
+					serviceid
+			);
+			
 			SalesProductListResponse salesList = salesClient
 					.findAllSalesByProductId(product.getId())
 					.orElseThrow(() -> new ValidationException("No sales found for this product"));
-			return ProductSalesResponse.of(product, salesList.getSalesIds());
+			
+			ProductSalesResponse response = ProductSalesResponse.of(product, salesList.getSalesIds());
+			
+			System.out.printf(
+					"Success response from Sales-API find sales by product ID %s with data %s | [transactionID: %s | serviceID: %s]\n",
+					id,
+					objectMapper.writeValueAsString(response),
+					transactionid,
+					serviceid
+			);
+			
+			return response;
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			throw new ValidationException("An error occurred when trying to get the product sales");
 		}
 	}
 	
 	public SuccessResponse checkProductsStock(ProductCheckStockRequest request) {
-		if (isEmpty(request) || isEmpty(request.getProducts())) {
-			throw new ValidationException("The products list must not be empty");
-		}
-		
-		request
+		try {
+			HttpServletRequest currentRequest = getCurrentRequest();
+			String transactionid = currentRequest.getHeader(TRANSACTION_ID);
+			Object serviceid = currentRequest.getAttribute(SERVICE_ID);
+			
+			System.out.printf(
+					"Request to POST on check products stock with data %s | [transactionID: %s | serviceID: %s]\n",
+					new ObjectMapper().writeValueAsString(request),
+					transactionid,
+					serviceid
+					);
+			
+			if (isEmpty(request) || isEmpty(request.getProducts())) {
+				throw new ValidationException("The products list must not be empty");
+			}
+			
+			request
 			.getProducts()
 			.forEach(this::validateStock);
-		
-		return SuccessResponse.create("All the products in the given list have available stock");
+			
+			SuccessResponse response = SuccessResponse.create("All the products in the given list have available stock");
+			
+			System.out.printf(
+					"Response to POST on check products stock with data %s | [transactionID: %s | serviceID: %s]\n",
+					new ObjectMapper().writeValueAsString(response),
+					transactionid,
+					serviceid
+					);
+			
+			return response;
+
+		} catch (Exception ex) {
+			throw new ValidationException(ex.getMessage());
+		}
 	}
 	
 	private void validateStock(ProductQuantityDTO productQuantity) {

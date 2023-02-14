@@ -5,6 +5,7 @@ import secrets from '../constants/secrets';
 export default function connect() {
   mongoose.connect(secrets.MONGO_URL, {
     useNewUrlParser: true,
+    serverSelectionTimeoutMS: 180000,
   });
 
   mongoose.connection.on('connected', () => {

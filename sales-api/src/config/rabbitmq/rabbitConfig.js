@@ -16,7 +16,7 @@ async function createQueue(connection, queue, routingKey, topic) {
 }
 
 async function connectRabbitMqAndCreateQueues() {
-  amqp.connect(secrets.RABBIT_URL, (error, connection) => {
+  amqp.connect(secrets.RABBIT_URL, { timeout: 180000 }, (error, connection) => {
     if (error) {
       throw new Error(error);
     }

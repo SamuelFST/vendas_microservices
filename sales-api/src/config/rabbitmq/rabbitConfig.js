@@ -54,7 +54,7 @@ export default async function connectRabbitMq() {
   console.log('env: ', env);
   if (env === 'container') {
     console.info('Waiting for rabbitMq start');
-    setInterval(() => {
+    setTimeout(() => {
       connectRabbitMqAndCreateQueues();
     }, 30000);
   } else {

@@ -16,7 +16,9 @@ const CONTAINER_ENV = 'container';
 
 if (env.NODE_ENV === CONTAINER_ENV) {
   console.info('Waiting for RabbitMQ and MongoDB containers to start...');
-  setInterval(() => {
+  setTimeout(() => {
+    connect();
+    connectRabbitMq();
   }, 30000);
 } else {
   connect();

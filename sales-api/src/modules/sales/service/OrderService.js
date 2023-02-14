@@ -34,7 +34,7 @@ class OrderService {
       };
 
       console.info(
-        `Response to GET all orders with data ${response} | [transactionID: ${transactionid} | serviceID: ${serviceid}]`,
+        `Response to GET all orders with data ${JSON.stringify(response)} | [transactionID: ${transactionid} | serviceID: ${serviceid}]`,
       );
 
       return response;

@@ -11,10 +11,18 @@ import connectRabbitMq from './src/config/rabbitmq/rabbitConfig';
 import orderRouter from './src/modules/sales/routes/OrderRoutes';
 
 const app = express();
+const { env } = process;
+const CONTAINER_ENV = 'container';
 
-connect();
-createInitialData();
-connectRabbitMq();
+if (env.NODE_ENV === CONTAINER_ENV) {
+  console.info('Waiting for RabbitMQ and MongoDB containers to start...');
+  setInterval(() => {
+  }, 30000);
+} else {
+  connect();
+  connectRabbitMq();
+  createInitialData();
+}
 
 app.get('/api/status', (req, res) => {
   return res.status(200).json({

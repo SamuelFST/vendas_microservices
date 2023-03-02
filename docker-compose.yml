@@ -54,6 +54,19 @@ services:
     ports:
       - 5433:5432
 
+  gateway-api:
+    build: './gateway-api'
+    container_name: gateway-api
+    networks:
+      - sales-network
+    environment:
+      - GATEWAY_PORT=10000
+      - AUTH_API_URL=http://auth-api:8080/
+      - PRODUCT_API_URL=http://product-api:8081/
+      - SALES_API_URL=http://sales-api:8082/
+    ports:
+      - 10000:10000
+
   product-api:
     build: './product-api'
     container_name: product-api

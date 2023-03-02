@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "dotenv": "^16.0.3",
+    "express-swagger-generator": "^1.1.17",
     "nodemon": "^2.0.20",
     "sucrase": "^3.29.0"
   }

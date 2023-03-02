@@ -2,6 +2,7 @@ import httpProxy from 'express-http-proxy';
 import dotenv from 'dotenv';
 import express from 'express';
 import logger from 'morgan';
+import esg from 'express-swagger-generator';
 
 import {
   GATEWAY_PORT,
@@ -9,10 +10,15 @@ import {
   PRODUCT_API_URL,
   SALES_API_URL,
 } from './src/config/secrets';
+import defaultOptions from './swagger.json';
 
 dotenv.config();
 
 const app = express();
+
+const options = Object.assign(defaultOptions, { basedir: __dirname });
+const expressSwagger = esg(app);
+expressSwagger(options);
 
 app.use(logger('dev'));
 

@@ -1,0 +1,28 @@
+{
+  "swaggerDefinition": {
+    "info": {
+      "description": "Endpoints of all sales microservices",
+      "title": "API GATEWAY - SALES MICROSERVICES",
+      "version": "1.0.0"
+    },
+    "host": "localhost:10000",
+    "basePath": "/",
+    "produces": [
+      "application/json"
+    ],
+    "schemes": [
+      "http"
+    ],
+    "securityDefinitions": {
+      "JWT": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": ""
+      }
+    }
+  },
+  "files": [
+    "./src/docs/**/*.js"
+  ]
+}

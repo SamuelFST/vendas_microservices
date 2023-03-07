@@ -2,6 +2,7 @@ package com.vendas_microservices.productapi.config.interceptor;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.vendas_microservices.productapi.config.PublicEndpoints;
 import com.vendas_microservices.productapi.config.exception.ValidationException;
 import com.vendas_microservices.productapi.modules.jwt.service.JwtService;
 
@@ -32,11 +34,21 @@ public class AuthInterceptor implements HandlerInterceptor {
 			throw new ValidationException("The transactionid header is required");
 		}
 		
+		if (isPublicEndpoint(request)) {
+			return true;
+		}
+		
 		String authorization = request.getHeader(AUTHORIZATION);
 		jwtService.validateAuthorization(authorization);
 		request.setAttribute("serviceid", UUID.randomUUID().toString());
 		
 		return true;
+	}
+	
+	private boolean isPublicEndpoint(HttpServletRequest request) {
+		return Arrays
+				.stream(PublicEndpoints.values())
+				.anyMatch(publicEndpoint -> request.getRequestURI().equals(publicEndpoint.getPublicEndpoint()));
 	}
 	
 	private boolean isOptions(HttpServletRequest request) {

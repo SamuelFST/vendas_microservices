@@ -11,6 +11,7 @@ import {
   SALES_API_URL,
 } from './src/config/secrets';
 import defaultOptions from './swagger.json';
+import router from './src/routes/routes';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ const expressSwagger = esg(app);
 expressSwagger(options);
 
 app.use(logger('dev'));
+app.use(router);
 
 function selectProxyHost(req, res) {
   if (req.path.startsWith('/api/users') || req.path.startsWith('/api/auth')) {

@@ -53,4 +53,5 @@ app.use((req, res, next) => {
 
 app.listen(GATEWAY_PORT, () => {
   console.log(`API Gateway running at http://localhost:${GATEWAY_PORT}`);
+  console.log(`Docs at http://localhost:${GATEWAY_PORT}/api-docs`);
 });
